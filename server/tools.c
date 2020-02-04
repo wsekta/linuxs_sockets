@@ -11,15 +11,12 @@
 
 void print_error(char *msg) {
     fprintf(stderr,"%s\n",msg);
-    exit(1);
+    exit(-1);
 }
 
 void setup(int argc, char *argv[]) {
     if (argc <= 3)
         print_error("too few arguments");
-
-
-    tcp_server_port = (int) strtol(argv[1], NULL, 10);
     char *p;
     int opt, argr = 0;
     while ((opt = getopt(argc, argv, "O:")) != -1) {
@@ -62,11 +59,11 @@ void create_epoll() {
         print_error("epoll_create1");
 }
 
-void add_to_epoll(struct type_of_epoll toe, int type) {
+void add_to_epoll(struct type_of_epoll *toe, int type) {
     struct epoll_event epoll_ev;
     epoll_ev.events = type;
-    epoll_ev.data.ptr = &toe;
-    epoll_ctl(epoll_fd, EPOLL_CTL_ADD, toe.fd, &epoll_ev);
+    epoll_ev.data.ptr = toe;
+    epoll_ctl(epoll_fd, EPOLL_CTL_ADD, toe->fd, &epoll_ev);
 }
 
 void make_nonblock(int fd) {

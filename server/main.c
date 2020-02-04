@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     create_server(tcp_server_port);
 
     struct epoll_event *events;
-    events = calloc(MAX_EPOLL_EVENTS, sizeof(struct epoll_event));
+    events = (struct epoll_event *) malloc(MAX_EPOLL_EVENTS * sizeof(struct epoll_event));
     while (1) {
         int events_size = epoll_wait(epoll_fd, events, MAX_EPOLL_EVENTS, -1);
         for (int i = 0; i < events_size; ++i) {

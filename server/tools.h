@@ -20,7 +20,7 @@ struct type_of_epoll {
 char *path_to_file;
 int file_no;
 int tcp_server_port;
-int server_fd, epoll_fd, file_fd;
+int epoll_fd, file_fd;
 
 void print_error(char *msg);
 
@@ -30,7 +30,7 @@ void make_new_log_file();
 
 void create_epoll();
 
-void add_to_epoll(struct type_of_epoll toe, int type);
+void add_to_epoll(struct type_of_epoll *toe, int type);
 
 void make_nonblock(int fd);
 

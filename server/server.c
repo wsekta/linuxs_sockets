@@ -10,6 +10,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <sys/un.h>
+#include <arpa/inet.h>
 
 void create_server(int port) {
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
@@ -19,16 +20,16 @@ void create_server(int port) {
 
     server_addr.sin_family = AF_INET;
     server_addr.sin_port = htons(port);
-    server_addr.sin_addr.s_addr = INADDR_ANY;
+    inet_aton("127.0.0.1", (struct in_addr *) &server_addr.sin_addr.s_addr);
     bzero(&(server_addr.sin_zero), 8);
 
     if (bind(server_fd, (struct sockaddr *) &server_addr, sizeof(struct sockaddr)) == -1)
         print_error("Unable to bind");
 
     make_nonblock(server_fd);
-    struct type_of_epoll toe;
-    toe.fd = server_fd;
-    toe.type = SERVER;
+    struct type_of_epoll* toe = (struct type_of_epoll*)malloc(sizeof(struct type_of_epoll));
+    toe->fd = server_fd;
+    toe->type = SERVER;
     add_to_epoll(toe, EPOLLIN | EPOLLET);
 
     listen(server_fd, 5);
@@ -41,27 +42,33 @@ void accept_new_connection() {
     if (cli_fd == -1)
         print_error("accept new client");
     make_nonblock(cli_fd);
-    struct type_of_epoll toe;
-    toe.fd = cli_fd;
-    toe.type = INET;
+    struct type_of_epoll* toe = (struct type_of_epoll*)malloc(sizeof(struct type_of_epoll));
+    toe->fd = cli_fd;
+    toe->type = INET;
     add_to_epoll(toe, EPOLLIN | EPOLLET);
+    printf("new client\n");
 }
 
 void process_inet_data(struct type_of_epoll *ptoe) {
     int fd = ptoe->fd;
-    struct sockaddr_un *sockaddr_un = (struct sockaddr_un *) malloc(sizeof(struct sockaddr_un));
-    read(fd, sockaddr_un, sizeof(struct sockaddr_un));
-    //TODO check if struct is complete
-    int new_fd = socket(AF_LOCAL, SOCK_STREAM, 0); //don't know if SOCK_STREAM is good
-    if (connect(new_fd, (struct sockaddr *) &sockaddr_un, sizeof(sockaddr_un))) {
-        make_nonblock(new_fd);
-        struct type_of_epoll toe;
-        toe.fd = new_fd;
-        toe.type = LOCAL;
-        toe.ptr = sockaddr_un;
-        add_to_epoll(toe, EPOLLIN | EPOLLET);
-    } else {
-        sockaddr_un->sun_family = -1;
-        write(fd, sockaddr_un, sizeof(struct sockaddr_un));
+    while(1) {
+        struct sockaddr_un *local_addres = (struct sockaddr_un *) malloc(sizeof(struct sockaddr_un));
+        if(read(fd, local_addres, sizeof(struct sockaddr_un))!=sizeof(struct sockaddr_un))
+            break;
+        int new_fd = socket(AF_LOCAL, SOCK_STREAM, 0); //don't know if SOCK_STREAM is good
+        if (!connect(new_fd, (struct sockaddr *) local_addres, sizeof(struct sockaddr_un))) {
+            make_nonblock(new_fd);
+            struct type_of_epoll *toe = (struct type_of_epoll *) malloc(sizeof(struct type_of_epoll));
+            toe->fd = new_fd;
+            toe->type = LOCAL;
+            toe->ptr = local_addres;
+            add_to_epoll(toe, EPOLLIN | EPOLLET);
+            write(fd, local_addres, sizeof(struct sockaddr_un));
+            printf("connected to local server\n");
+        } else {
+            local_addres->sun_family = -1;
+            write(fd, local_addres, sizeof(struct sockaddr_un));
+            printf("couldn't connect to local server \n%s\n", local_addres->sun_path + 1);
+        }
     }
 }

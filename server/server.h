@@ -7,6 +7,8 @@
 
 #include "tools.h"
 
+int server_fd;
+
 void create_server(int port);
 
 void accept_new_connection();

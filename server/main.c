@@ -12,7 +12,7 @@
 
 #define MAX_EPOLL_EVENTS 20
 
-void process_local_data(int fd);
+void process_local_data(struct type_of_epoll *ptoe);
 
 int main(int argc, char *argv[]) {
     setup(argc, argv);
@@ -34,10 +34,10 @@ int main(int argc, char *argv[]) {
                         accept_new_connection();
                         break;
                     case INET:
-                        process_inet_data(((struct type_of_epoll *) (events[i].data.ptr))->fd);
+                        process_inet_data((struct type_of_epoll *) events[i].data.ptr);
                         break;
                     case LOCAL:
-                        process_local_data(((struct type_of_epoll *) (events[i].data.ptr))->fd);
+                        process_local_data((struct type_of_epoll *) events[i].data.ptr);
                         break;
                     default:
                         break;
@@ -47,6 +47,6 @@ int main(int argc, char *argv[]) {
     }
 }
 
-void process_local_data(int fd) {
+void process_local_data(struct type_of_epoll *ptoe) {
     printf("elo\n");
 }

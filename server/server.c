@@ -3,7 +3,6 @@
 //
 
 #include "server.h"
-#include "tools.h"
 
 #include <unistd.h>
 #include <sys/socket.h>
@@ -48,7 +47,8 @@ void accept_new_connection() {
     add_to_epoll(toe, EPOLLIN | EPOLLET);
 }
 
-void process_inet_data(int fd) {
+void process_inet_data(struct type_of_epoll *ptoe) {
+    int fd = ptoe->fd;
     struct sockaddr_un *sockaddr_un = (struct sockaddr_un *) malloc(sizeof(struct sockaddr_un));
     read(fd, sockaddr_un, sizeof(struct sockaddr_un));
     //TODO check if struct is complete

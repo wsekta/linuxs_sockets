@@ -19,6 +19,8 @@ struct type_of_epoll {
     enum {SERVER,INET,LOCAL} type;
 };
 
+char *path_to_file;
+int tcp_server_port;
 int server_fd,epoll_fd;
 
 inline void error(char *msg)
@@ -27,6 +29,7 @@ inline void error(char *msg)
     exit(-1);
 }
 
+void load_arguments(int argc, char* argv[]);
 void create_server(int port);
 void create_epoll();
 void add_to_epoll(struct type_of_epoll toe,int type);
@@ -37,14 +40,7 @@ void process_local_data(int fd);
 
 int main(int argc, char* argv[])
 {
-    if(argc <= 3)
-    {
-        printf("too few arguments\n");
-        return -1;
-    }
-
-    int tcp_server_port;
-    tcp_server_port = strtol(argv[1],NULL,10);
+    load_arguments(argc,argv);
 
     create_epoll();
     create_server(tcp_server_port);
@@ -56,17 +52,24 @@ int main(int argc, char* argv[])
         int events_size = epoll_wait(epoll_fd,events,MAX_EPOLL_EVENTS,-1);
         for(int i = 0;i < events_size;++i)
         {
-            switch (((struct type_of_epoll*)(events[i].data.ptr))->type)
-            {
-                case SERVER:
-                    accept_new_connection();
-                    break;
-                case INET:
-                    process_inet_data(((struct type_of_epoll*)(events[i].data.ptr))->fd);
-                    break;
-                case LOCAL:
-                    process_local_data(((struct type_of_epoll*)(events[i].data.ptr))->fd);
-                    break;
+            if (events[i].events & EPOLLERR || events[i].events & EPOLLHUP || !(events[i].events & EPOLLIN)) {
+                printf("client disconnected\n");
+                close(((struct type_of_epoll *) (events[i].data.ptr))->fd);
+                epoll_ctl(epoll_fd,EPOLL_CTL_DEL,((struct type_of_epoll *) (events[i].data.ptr))->fd,NULL);
+            } else {
+                switch (((struct type_of_epoll *) (events[i].data.ptr))->type) {
+                    case SERVER:
+                        accept_new_connection();
+                        break;
+                    case INET:
+                        process_inet_data(((struct type_of_epoll *) (events[i].data.ptr))->fd);
+                        break;
+                    case LOCAL:
+                        process_local_data(((struct type_of_epoll *) (events[i].data.ptr))->fd);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
     }
@@ -159,5 +162,13 @@ void process_inet_data(int fd)
 
 void process_local_data(int fd)
 {
+    printf("elo\n");
+}
 
+void load_arguments(int argc, char* argv[])
+{
+    if(argc <= 3)
+        error("too few arguments\n");
+
+    tcp_server_port = strtol(argv[1],NULL,10);
 }

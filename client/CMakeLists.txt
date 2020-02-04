@@ -1,3 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 
-project(pwsl03 LANGUAGES C)
+project(multiwriter LANGUAGES C)
+
+set(CMAKE_C_FLAGS "-Wall")
+add_executable(multiwriter main.c)

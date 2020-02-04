@@ -11,6 +11,7 @@
 #include <netinet/in.h>
 #include <string.h>
 #include <fcntl.h>
+#include <signal.h>
 
 #define MAX_EPOLL_EVENTS 20
 
@@ -22,15 +23,20 @@ struct type_of_epoll {
 };
 
 char *path_to_file;
+int file_no=0;
 int tcp_server_port;
-int server_fd, epoll_fd;
+int server_fd, epoll_fd, file_fd=0;
 
 inline void error(char *msg) {
     perror(msg);
     exit(-1);
 }
 
-void load_arguments(int argc, char *argv[]);
+void setup(int argc, char *argv[]);
+
+void make_new_log_file();
+
+void handler(int sig);
 
 void create_server(int port);
 
@@ -47,7 +53,7 @@ void process_inet_data(int fd);
 void process_local_data(int fd);
 
 int main(int argc, char *argv[]) {
-    load_arguments(argc, argv);
+    setup(argc, argv);
 
     create_epoll();
     create_server(tcp_server_port);
@@ -161,7 +167,7 @@ void process_local_data(int fd) {
     printf("elo\n");
 }
 
-void load_arguments(int argc, char *argv[]) {
+void setup(int argc, char *argv[]) {
     if (argc <= 3)
         error("too few arguments\n");
     tcp_server_port = (int) strtol(argv[1], NULL, 10);
@@ -184,4 +190,23 @@ void load_arguments(int argc, char *argv[]) {
         error("argument <port> is wrong\n");
     if (optind + 1 < argc)
         error("additional positional argument\n");
+    make_new_log_file();
+    struct sigaction sa;
+    sa.sa_handler=handler;
+    sigaction(SIGUSR1,&sa,NULL);
+}
+
+void make_new_log_file()
+{
+    char new_file_path[1024];
+    do{
+        close(file_fd);
+        sprintf(new_file_path,"%s%03d", path_to_file, file_no++);
+        file_fd = open(new_file_path,O_WRONLY|O_CREAT);
+    }while(file_fd == -1);
+}
+
+void handler(int sig)
+{
+    make_new_log_file();
 }

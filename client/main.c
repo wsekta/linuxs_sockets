@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-inline void error(char *msg) {
+inline void print_error(char *msg) {
     perror(msg);
     exit(-1);
 }

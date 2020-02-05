@@ -53,8 +53,10 @@ void process_inet_data(struct type_of_epoll *ptoe) {
     int fd = ptoe->fd;
     while(1) {
         struct sockaddr_un *local_addres = (struct sockaddr_un *) malloc(sizeof(struct sockaddr_un));
-        if(read(fd, local_addres, sizeof(struct sockaddr_un))!=sizeof(struct sockaddr_un))
+        if(read(fd, local_addres, sizeof(struct sockaddr_un))!=sizeof(struct sockaddr_un)) {
+            free(local_addres);
             break;
+        }
         int new_fd = socket(AF_LOCAL, SOCK_STREAM, 0); //don't know if SOCK_STREAM is good
         if (!connect(new_fd, (struct sockaddr *) local_addres, sizeof(struct sockaddr_un))) {
             make_nonblock(new_fd);

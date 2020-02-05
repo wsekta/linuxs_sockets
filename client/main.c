@@ -29,13 +29,16 @@ int main(int argc,char* argv[])
                 epoll_ctl(epoll_fd, EPOLL_CTL_DEL, events[i].data.fd, NULL);
             } else {
                 if(events[i].data.fd == local_server_fd){
-                    //TODO
+                    accept_new_local_connection();
                 } else if(events[i].data.fd == inet_sock_fd){
-                    //TODO
+                    recv_from_server();
                 } else {
                     //TODO
                 }
             }
         }
+        if(error_no+accepted_no == S_arg)
+            break;
     }
+
 }

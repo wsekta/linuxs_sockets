@@ -10,6 +10,6 @@ set(SOURCES
 
 set(HEADERS
         tools.h
-        local_server.h inet_sock.h)
+        local_server.h inet_sock.h timer.h)
 
 add_executable(multiwriter ${SOURCES} ${HEADERS})

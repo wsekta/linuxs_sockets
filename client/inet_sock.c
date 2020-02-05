@@ -12,9 +12,13 @@
 #include <arpa/inet.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
 
 void create_inet_socket()
 {
+    error_no=0;
+    accepted_no=0;
     if ((inet_sock_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
         print_error("wrong server initialization");
     struct sockaddr_in server_addr;
@@ -32,4 +36,23 @@ void send_local_arddress(){
     int i;
     for(i=0;i<S_arg;i++)
         write(inet_sock_fd,&local_server_address, sizeof(local_server_address));
+}
+
+void recv_from_server()
+{
+    while(1) {
+        struct sockaddr_un *local_addres = (struct sockaddr_un *) malloc(sizeof(struct sockaddr_un));
+        if (read(inet_sock_fd, local_addres, sizeof(struct sockaddr_un)) != sizeof(struct sockaddr_un))
+            break;
+        if(local_addres->sun_family == -1)
+        {
+            error_no++;
+            printf("server couldn't connect to local server\n");
+            //do if error occurred
+        } else {
+            accepted_no++;
+            printf("working!\n");
+            //do if error don't occurred
+        }
+    }
 }

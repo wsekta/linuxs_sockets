@@ -5,12 +5,15 @@
 #include "tools.h"
 #include "local_server.h"
 #include <unistd.h>
+#include <stdlib.h>
 #include <fcntl.h>
 #include <sys/socket.h>
 #include <sys/epoll.h>
 
 void create_local_server()
 {
+    local_sock_no=0;
+    local_sock_fds = (int*)malloc(S_arg* sizeof(int));
     if((local_server_fd=socket(AF_LOCAL,SOCK_STREAM,0))==-1)
         print_error("error in creation local_server socket");
     int rand_fd = open("/dev/urandom",O_RDONLY);
@@ -26,4 +29,11 @@ void create_local_server()
     make_nonblock(local_server_fd);
     add_to_epoll(local_server_fd, EPOLLIN | EPOLLET);
     listen(local_server_fd,S_arg);
+}
+
+void accept_new_local_connection()
+{
+    if(local_sock_no==S_arg)
+        print_error("to many connection in file");
+    local_sock_fds[local_sock_no++]=accept(local_server_fd,NULL,NULL);
 }

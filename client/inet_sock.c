@@ -1,7 +1,3 @@
-//
-// Created by student on 04.02.2020.
-//
-
 #include "inet_sock.h"
 #include "tools.h"
 #include "local_server.h"

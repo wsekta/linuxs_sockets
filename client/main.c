@@ -1,6 +1,3 @@
-//
-// Created by wojtek on 04.02.2020.
-//
 #include "tools.h"
 #include "local_server.h"
 #include "inet_sock.h"
@@ -27,7 +24,7 @@ int main(int argc,char* argv[])
     {
         int events_size = epoll_wait(epoll_fd, events, MAX_EPOLL_EVENTS, epoll_timeout);
         for (int i = 0; i < events_size; ++i) {
-            if ((events[i].events & EPOLLERR) | (events[i].events & EPOLLHUP) | !(events[i].events & EPOLLIN)) {
+            if ((events[i].events & EPOLLERR) | !(events[i].events & EPOLLIN)) {
                 if(events[i].data.fd!=local_server_fd && events[i].data.fd !=inet_sock_fd)
                     remove_from_working_sockets(events[i].data.fd);
                 else {

@@ -1,7 +1,3 @@
-//
-// Created by student on 04.02.2020.
-//
-
 #ifndef MULTIWRITER_LOCAL_SERVER_H
 #define MULTIWRITER_LOCAL_SERVER_H
 

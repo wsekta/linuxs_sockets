@@ -1,6 +1,3 @@
-//
-// Created by student on 04.02.2020.
-//
 #include "tools.h"
 
 #include <signal.h>

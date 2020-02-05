@@ -1,7 +1,3 @@
-//
-// Created by student on 04.02.2020.
-//
-
 #ifndef PWSL03_CLI_TOOLS_H
 #define PWSL03_CLI_TOOLS_H
 

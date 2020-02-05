@@ -1,7 +1,3 @@
-//
-// Created by wojtek on 05.02.2020.
-//
-
 #ifndef MULTIWRITER_TIMER_LIB_H
 #define MULTIWRITER_TIMER_LIB_H
 

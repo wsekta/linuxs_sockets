@@ -1,7 +1,3 @@
-//
-// Created by student on 04.02.2020.
-//
-
 #ifndef MULTIWRITER_INET_SOCK_H
 #define MULTIWRITER_INET_SOCK_H
 

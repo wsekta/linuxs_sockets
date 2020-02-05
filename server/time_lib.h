@@ -1,7 +1,3 @@
-//
-// Created by wojtek on 05.02.2020.
-//
-
 #ifndef MASSIVEREADER_TIME_LIB_H
 #define MASSIVEREADER_TIME_LIB_H
 

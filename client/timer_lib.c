@@ -1,11 +1,6 @@
-//
-// Created by wojtek on 05.02.2020.
-//
-
 #include "timer_lib.h"
 #include "tools.h"
 
-#include <unistd.h>
 #include <signal.h>
 #include <string.h>
 #include <stdlib.h>
@@ -25,7 +20,6 @@ void preprocess_time() {
 }
 
 void set_killer() {
-    //już tylko killer
     struct sigaction sa;
     sa.sa_handler=do_at_end;
     if(sigaction(SIGUSR1,&sa,NULL)==-1)
@@ -100,8 +94,11 @@ char *time_repr(struct timespec ts)
 
 void add_to_summary(struct timespec ts_start,struct timespec ts_end)
 {
-    long nsec = summary_time.tv_nsec+ts_end.tv_nsec - ts_start.tv_nsec;
-    long shift = nsec/1000000000l;
-    summary_time.tv_sec += ts_end.tv_sec - ts_start.tv_sec + shift;
-    summary_time.tv_nsec = nsec%1000000000l;
+    long long ans,bns,resns;
+    ans = ts_start.tv_sec*1000000000l+ts_start.tv_nsec;
+    bns = ts_end.tv_sec*1000000000l+ts_end.tv_nsec;
+    resns = summary_time.tv_sec*1000000000l+summary_time.tv_nsec;
+    resns += bns-ans;
+    summary_time.tv_sec = resns/1000000000l;
+    summary_time.tv_nsec = resns%1000000000l;
 }

@@ -16,4 +16,10 @@ void create_local_server();
 
 void accept_new_local_connection();
 
+void close_local_server();
+
+void send_local_data();
+
+void remove_from_working_sockets(int fd);
+
 #endif //MULTIWRITER_LOCAL_SERVER_H

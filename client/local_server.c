@@ -4,6 +4,8 @@
 
 #include "tools.h"
 #include "local_server.h"
+#include "timer_lib.h"
+
 #include <unistd.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -23,7 +25,8 @@ void create_local_server()
     local_server_address.sun_path[0]=0;
     if(read(rand_fd,local_server_address.sun_path+1,107)!=107)
         print_error("error in read from /dev/urandom");
-    close(rand_fd);
+    if(close(rand_fd))
+        print_error("urand close error");
     if(bind(local_server_fd,(struct sockaddr *)&local_server_address, sizeof(local_server_address))==-1)
         print_error("error while binding local_server socket");
     make_nonblock(local_server_fd);
@@ -35,5 +38,42 @@ void accept_new_local_connection()
 {
     if(local_sock_no==S_arg)
         print_error("to many connection in file");
-    local_sock_fds[local_sock_no++]=accept(local_server_fd,NULL,NULL);
+    if((local_sock_fds[local_sock_no]=accept(local_server_fd,NULL,NULL))==-1)
+        print_error("accept local connection");
+    make_nonblock(local_sock_fds[local_sock_no++]);
+}
+
+void close_local_server()
+{
+    if(close(local_server_fd))
+        print_error("error while closing af_local server");
+}
+
+void send_local_data() //3.wysyłanie komunikatów
+{
+    struct timespec ts_start;
+    if(clock_gettime(CLOCK_REALTIME,&ts_start))
+        print_error("clock_gettime");
+    int sock_no = rand()%local_sock_no;
+    char *repr = time_repr(ts_start);
+    write(local_sock_fds[sock_no],repr, sizeof(repr));
+    write(local_sock_fds[sock_no],&local_server_address, sizeof(local_server_address));
+    write(local_sock_fds[sock_no],&ts_start, sizeof(ts_start));
+    struct timespec ts_end;
+    if(clock_gettime(CLOCK_REALTIME,&ts_end))
+        print_error("clock_gettime");
+    add_to_summary(ts_start,ts_end);
+}
+
+void remove_from_working_sockets(int fd)
+{
+    int i=0;
+    while(i<local_sock_no)
+        if(local_sock_fds[i++]==fd)
+            break;
+    if(i==local_sock_no)
+        return;
+    close(local_sock_fds[--i]);
+    epoll_ctl(epoll_fd,EPOLL_CTL_DEL,local_sock_fds[i],NULL);
+    local_sock_fds[i]=local_sock_fds[--local_sock_no];
 }

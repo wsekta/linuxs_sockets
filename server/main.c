@@ -48,5 +48,6 @@ int main(int argc, char *argv[]) {
 }
 
 void process_local_data(struct type_of_epoll *ptoe) {
-    printf("elo\n");
+    int fd = ptoe->fd;
+    while(10==read(fd,NULL,10));
 }

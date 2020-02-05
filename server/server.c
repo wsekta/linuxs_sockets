@@ -57,7 +57,7 @@ void process_inet_data(struct type_of_epoll *ptoe) {
             free(local_addres);
             break;
         }
-        int new_fd = socket(AF_LOCAL, SOCK_STREAM, 0); //don't know if SOCK_STREAM is good
+        int new_fd = socket(AF_LOCAL, SOCK_STREAM, 0);
         if (!connect(new_fd, (struct sockaddr *) local_addres, sizeof(struct sockaddr_un))) {
             make_nonblock(new_fd);
             struct type_of_epoll *toe = (struct type_of_epoll *) malloc(sizeof(struct type_of_epoll));

@@ -13,7 +13,6 @@
 #include <string.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <stdio.h>
 
 void create_inet_socket()
 {
@@ -47,12 +46,18 @@ void recv_from_server()
         if(local_addres->sun_family == -1)
         {
             error_no++;
-            printf("server couldn't connect to local server\n");
+            //printf("server couldn't connect to local server\n");
             //do if error occurred
         } else {
             accepted_no++;
-            printf("working!\n");
+            //printf("working!\n");
             //do if error don't occurred
         }
     }
+}
+
+void close_inet_socket()
+{
+    if(close(inet_sock_fd))
+        print_error("error in closing inet sock");
 }

@@ -14,4 +14,6 @@ void send_local_arddress();
 
 void recv_from_server();
 
+void close_inet_socket();
+
 #endif //MULTIWRITER_INET_SOCK_H

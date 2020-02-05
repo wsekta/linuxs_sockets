@@ -3,6 +3,8 @@
 //
 
 #include "tools.h"
+#include "timer_lib.h"
+#include "local_server.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,6 +18,7 @@ void print_error(char *msg) {
 }
 
 void setup(int argc, char **argv) {
+    srand(time(NULL));
     char *p;
     int opt;
     int S_flag =0,p_flag =0,d_flag=0,T_flag=0;
@@ -59,6 +62,7 @@ void setup(int argc, char **argv) {
         print_error("some argument(s) wasn't specified");
 
     create_epoll();
+    preprocess_time();
 }
 
 void create_epoll() {
@@ -70,7 +74,7 @@ void create_epoll() {
 void add_to_epoll(int fd, int type) {
     struct epoll_event epoll_ev;
     epoll_ev.events = type;
-    epoll_ev.data.ptr = fd;
+    epoll_ev.data.fd = fd;
     epoll_ctl(epoll_fd, EPOLL_CTL_ADD, fd, &epoll_ev);
 }
 
@@ -82,4 +86,11 @@ void make_nonblock(int fd) {
     flags |= O_NONBLOCK;
     if (fcntl(fd, F_SETFL, flags) == -1)
         print_error("fcntl");
+}
+
+void do_at_end()
+{
+    printf("%s\n",time_repr(summary_time));
+    free(local_sock_fds);
+    exit(0);
 }

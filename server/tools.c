@@ -49,7 +49,7 @@ void make_new_log_file()
     do{
         close(file_fd);
         sprintf(new_file_path,"%s%03d", path_to_file, file_no++);
-        file_fd = open(new_file_path,O_WRONLY|O_CREAT);
+        file_fd = open(new_file_path,O_WRONLY|O_CREAT|O_TRUNC,0777);
     }while(file_fd == -1);
 }
 

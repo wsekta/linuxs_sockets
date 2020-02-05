@@ -56,8 +56,10 @@ void send_local_data() //3.wysyłanie komunikatów
         print_error("clock_gettime");
     int sock_no = rand()%local_sock_no;
     char *repr = time_repr(ts_start);
-    write(local_sock_fds[sock_no],repr, sizeof(repr));
-    write(local_sock_fds[sock_no],&local_server_address, sizeof(local_server_address));
+    int i=0;
+    while(repr[i++]);
+    write(local_sock_fds[sock_no],repr, i);
+    write(local_sock_fds[sock_no],&local_server_address, sizeof(struct sockaddr_un));
     write(local_sock_fds[sock_no],&ts_start, sizeof(ts_start));
     struct timespec ts_end;
     if(clock_gettime(CLOCK_REALTIME,&ts_end))

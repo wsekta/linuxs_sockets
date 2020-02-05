@@ -45,7 +45,7 @@ void set_killer() {
 }
 
 void sleep_wait_time() {
-    memcpy(&tmp, &wait_time, sizeof(wait_time));
+    nanosleep(&wait_time, &tmp);
     while (tmp.tv_sec != 0 || tmp.tv_nsec != 0) {
         nanosleep(&tmp, &tmp1);
         tmp = tmp1;

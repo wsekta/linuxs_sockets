@@ -7,13 +7,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/un.h>
 
 struct type_of_epoll {
     int fd;
     enum {
         SERVER, INET, LOCAL
     } type;
-    void* ptr;
+    struct sockaddr_un* ptr;
 };
 
 //globals

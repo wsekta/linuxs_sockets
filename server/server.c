@@ -46,7 +46,6 @@ void accept_new_connection() {
     toe->fd = cli_fd;
     toe->type = INET;
     add_to_epoll(toe, EPOLLIN | EPOLLET);
-    printf("new client\n");
 }
 
 void process_inet_data(struct type_of_epoll *ptoe) {
@@ -66,11 +65,9 @@ void process_inet_data(struct type_of_epoll *ptoe) {
             toe->ptr = local_addres;
             add_to_epoll(toe, EPOLLIN | EPOLLET);
             write(fd, local_addres, sizeof(struct sockaddr_un));
-            printf("connected to local server\n");
         } else {
             local_addres->sun_family = -1;
             write(fd, local_addres, sizeof(struct sockaddr_un));
-            printf("couldn't connect to local server \n%s\n", local_addres->sun_path + 1);
         }
     }
 }
